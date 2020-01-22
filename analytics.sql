@@ -66,4 +66,13 @@ group by sales.ENGLISHPRODUCTCATERYNAME;
 
 -- what was the increase / decrease month to month of profit (salesamount - totalproductcost)
 -- for each sales territory country
-
+select d.CALENDARYEAR,
+       d.MONTHNUMBEROFYEAR,
+       d.ENGLISHMONTHNAME,
+       t.SALESTERRITORYCOUNTRY,
+       sum(f.SALESAMOUNT - f.TOTALPRODUCTCOST) as profit, profit - lag(profit, 1, 0) over (order by t.SALESTERRITORYCOUNTRY, d.CALENDARYEAR, d.MONTHNUMBEROFYEAR) as change_from_last_month
+from FACTINTERNETSALES f
+inner join DIMDATE d on f.ORDERDATEKEY = d.DATEKEY
+inner join DIMSALESTERRITORY t on f.SALESTERRITORYKEY = t.SALESTERRITORYKEY
+group by d.CALENDARYEAR, d.MONTHNUMBEROFYEAR, t.SALESTERRITORYCOUNTRY, d.ENGLISHMONTHNAME
+order by d.CALENDARYEAR, d.MONTHNUMBEROFYEAR, t.SALESTERRITORYCOUNTRY;
